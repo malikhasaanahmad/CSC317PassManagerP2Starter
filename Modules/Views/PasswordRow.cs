@@ -1,4 +1,13 @@
-﻿using System;
+/*
+    Author: Malik Hasaan Ahmad
+    ID: w10171527   
+    Assignment: Password Manager Part 2
+
+    Description:
+    Defines a row in the password list and handles bindings for UI interactions.
+*/
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -6,13 +15,6 @@ using System.Text;
 using System.Threading.Tasks;
 using CSC317PassManagerP2Starter.Modules.Models;
 
-
-
-/* This module contains the class definition for Password Row.
- * 
- * The methods are missing their bodies.  Fill in the method definitions below.
- * 
- */
 namespace CSC317PassManagerP2Starter.Modules.Views
 {
     public class PasswordRow : BindableObject, INotifyPropertyChanged
@@ -26,104 +28,77 @@ namespace CSC317PassManagerP2Starter.Modules.Views
             _pass = source;
         }
 
-        //Create your Binding Properties here, which should reflect the front-end bindings.
-        //See the example of "Platform" below.
+        // Binding property for platform name
         public string Platform
         {
-            get
-            {
-                //complete getter for Platform.  currenly returns an empty string. 
-                return "";
-            }
+            get => _pass?.PlatformName ?? ""; // Get platform name or empty string
             set
             {
-                //complete setter for Platform.
-
-                //This needs to be called for updating the binding when
-                //the platform name is edited.  Leave here.
-                RefreshRow();
+                if (_pass.PlatformName != value)
+                {
+                    _pass.PlatformName = value;
+                    RefreshRow(); // Update UI bindings
+                }
             }
         }
 
+        // Binding property for platform username
         public string PlatformUserName
         {
-            get
-            {
-                //Complete getter for User Name.
-                return "";
-            }
+            get => _pass?.PlatformUserName ?? ""; // Get username or empty string
             set
             {
-                //complete setter for User Name.
-                RefreshRow();
+                if (_pass.PlatformUserName != value)
+                {
+                    _pass.PlatformUserName = value;
+                    RefreshRow(); // Update UI bindings
+                }
             }
         }
 
+        // Binding property for platform password
         public string PlatformPassword
         {
-            get
-            {
-               //complete getter for Password.  Currenly returns "hidden."
-               //This should return the actual password is the Show toggle
-               //is true.
-               //note that the password should be decrypted using the user's
-               //encryption key before being shown.
-               return "<hidden>";
-            }
+            get => App.PasswordController.DecryptPassword(_pass.PasswordText); // Get decrypted password
             set
             {
-                //complete setter for password.  Note that this ONLY changes the password
-                //stored in the row.  The password should not be committed to the model
-                //data until save is clicked.
-
-
-                RefreshRow();
+                _pass.PasswordText = App.PasswordController.EncryptPassword(value); // Encrypt and set password
+                RefreshRow(); // Update UI bindings
             }
         }
 
-        public int PasswordID
-        {
-            get
-            {
-                //complete getter for the pass ID.  Is binded to the edit/save/copy/delete buttons.
-                //currently returns -1;
-                return -1;
-            }
-        }
+        // Binding property for password ID
+        public int PasswordID => _pass?.ID ?? -1; // Get password ID or -1 if null
 
+        // Binding property to toggle password visibility
         public bool IsShown
         {
-            get
-            {
-                //complete getter for IsShown, which is binded to the Show Password
-                //toggle/switch.
-                return false;
-            }
+            get => _isVisible; // Get visibility state
             set
             {
-                //complete setter for IsShown.
-                RefreshRow();
+                if (_isVisible != value)
+                {
+                    _isVisible = value;
+                    RefreshRow(); // Update UI bindings
+                }
             }
         }
 
+        // Binding property to toggle editing mode
         public bool Editing
         {
-            get
-            {
-                //Complete getter for Editing, which is toggled when the "edit/save" button
-                //is clicked.  
-                return false;
-            }
+            get => _editing; // Get editing state
             set
             {
-                //Complete setter for Editing.
-                RefreshRow();
+                if (_editing != value)
+                {
+                    _editing = value;
+                    RefreshRow(); // Update UI bindings
+                }
             }
         }
 
-
-        //This is called when a bound property is changed on the front-end.  Causes the 
-        //front-end to update the collection view.
+        // Updates UI when a property changes
         private void RefreshRow()
         {
             OnPropertyChanged(nameof(Platform));
@@ -133,11 +108,14 @@ namespace CSC317PassManagerP2Starter.Modules.Views
             OnPropertyChanged(nameof(Editing));
         }
 
+        // Saves password changes when "save" is clicked
         public void SavePassword()
         {
-            //Is called when the "save" button is clicked.  Saves the changes to the
-            //password to the model data.
+            if (Editing)
+            {
+                App.PasswordController.UpdatePassword(_pass); // Save changes to the model
+                Editing = false; // Turn off editing mode
+            }
         }
     }
-
 }
