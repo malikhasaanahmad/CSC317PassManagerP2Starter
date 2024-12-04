@@ -4,7 +4,7 @@
     Assignment: Password Manager Part 2
 
     Description:
-    Backend implementation of a simple password manager app.
+    Backend implementation of a password manager app.
 */
 
 using CSC317PassManagerP2Starter.Modules.Models;
